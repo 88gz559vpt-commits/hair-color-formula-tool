@@ -1,0 +1,122 @@
+[
+  {
+    "id": "color_001",
+    "name": "冷棕色",
+    "tone": "冷色",
+    "levelRange": { "min": 6, "max": 7 },
+    "targetLevel": 7,
+    "targetEffect": "低调冷感棕色，适合通勤与遮白微调整",
+    "baseRequirement": "底色建议在6-7度",
+    "formula": [
+      { "product": "染膏A", "shade": "7/1", "ratio": 1 },
+      { "product": "染膏B", "shade": "6/0", "ratio": 0.3 }
+    ],
+    "developer": "6%",
+    "mixRatio": "1:1",
+    "processingTime": "35分钟",
+    "needBleach": false,
+    "suitableForGrayCoverage": true,
+    "notes": ["底色偏暖时需要增加冷色控制", "白发比例高时增加基色比例"],
+    "risks": ["发尾过浅时容易偏暗", "暖色残留明显时可能偏浊"]
+  },
+  {
+    "id": "color_002",
+    "name": "雾感茶棕",
+    "tone": "雾感",
+    "levelRange": { "min": 8, "max": 9 },
+    "targetLevel": 8,
+    "targetEffect": "柔和雾面茶棕，降低橙黄底色的透出",
+    "baseRequirement": "底色建议在8-9度，发尾不宜过度受损",
+    "formula": [
+      { "product": "染膏A", "shade": "8/11", "ratio": 1 },
+      { "product": "染膏C", "shade": "8/7", "ratio": 0.5 }
+    ],
+    "developer": "6%",
+    "mixRatio": "1:1",
+    "processingTime": "30-35分钟",
+    "needBleach": false,
+    "suitableForGrayCoverage": false,
+    "notes": ["暖色残留重时先做色素清理", "发尾过浅时降低灰感比例"],
+    "risks": ["白发比例高时遮盖不足", "底色不均会导致雾感斑驳"]
+  },
+  {
+    "id": "color_003",
+    "name": "奶茶米棕",
+    "tone": "暖中性",
+    "levelRange": { "min": 10, "max": 12 },
+    "targetLevel": 10,
+    "targetEffect": "透明轻盈的奶茶米棕效果",
+    "baseRequirement": "底色建议在10-12度，橙红残留需先处理",
+    "formula": [
+      { "product": "染膏D", "shade": "10/7", "ratio": 1 },
+      { "product": "染膏E", "shade": "10/1", "ratio": 0.2 }
+    ],
+    "developer": "3%或6%",
+    "mixRatio": "1:1.5",
+    "processingTime": "25-30分钟",
+    "needBleach": true,
+    "suitableForGrayCoverage": false,
+    "notes": ["建议统一底色后再上色", "严重受损发尾缩短停放时间"],
+    "risks": ["底色不足会偏橙", "高明度发尾容易空色或吸色不均"]
+  },
+  {
+    "id": "color_004",
+    "name": "玫瑰粉棕",
+    "tone": "暖色",
+    "levelRange": { "min": 13, "max": 15 },
+    "targetLevel": 13,
+    "targetEffect": "粉棕调明显，保留柔和暖感",
+    "baseRequirement": "底色建议在13-15度且尽量干净",
+    "formula": [
+      { "product": "染膏F", "shade": "PINK", "ratio": 0.6 },
+      { "product": "染膏D", "shade": "10/7", "ratio": 1 }
+    ],
+    "developer": "3%",
+    "mixRatio": "1:1.5",
+    "processingTime": "20-25分钟",
+    "needBleach": true,
+    "suitableForGrayCoverage": false,
+    "notes": ["漂后需评估发尾弹性", "允许明显褪色时更适合此类透明色"],
+    "risks": ["残留冷色会影响粉感", "受损发尾容易吸深"]
+  },
+  {
+    "id": "color_005",
+    "name": "铂金灰",
+    "tone": "冷色",
+    "levelRange": { "min": 16, "max": null },
+    "targetLevel": 16,
+    "targetEffect": "高明度铂金灰冷感效果",
+    "baseRequirement": "底色需16度以上并接近均匀浅黄",
+    "formula": [
+      { "product": "染膏G", "shade": "SILVER", "ratio": 1 },
+      { "product": "染膏H", "shade": "VIOLET", "ratio": 0.1 }
+    ],
+    "developer": "1.5%或3%",
+    "mixRatio": "1:2",
+    "processingTime": "10-20分钟，需目测",
+    "needBleach": true,
+    "suitableForGrayCoverage": false,
+    "notes": ["必须先做发质承受度评估", "建议分段漂浅并做护理"],
+    "risks": ["对发质要求高", "底色不够浅会偏绿偏脏"]
+  },
+  {
+    "id": "color_006",
+    "name": "自然黑茶",
+    "tone": "自然色",
+    "levelRange": { "min": 6, "max": 7 },
+    "targetLevel": 6,
+    "targetEffect": "自然深茶感，可兼顾低比例白发",
+    "baseRequirement": "底色6-7度或浅色回填后使用",
+    "formula": [
+      { "product": "染膏B", "shade": "6/0", "ratio": 1 },
+      { "product": "染膏C", "shade": "6/7", "ratio": 0.5 }
+    ],
+    "developer": "6%",
+    "mixRatio": "1:1",
+    "processingTime": "35分钟",
+    "needBleach": false,
+    "suitableForGrayCoverage": true,
+    "notes": ["白发比例超过50%时提高基色比例", "浅发尾建议先回填暖色素"],
+    "risks": ["发尾过浅可能沉暗", "一碗涂抹容易根部偏亮"]
+  }
+]

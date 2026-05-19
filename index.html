@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>染发配方工具</title>
+    <style>
+      :root { color: #172033; background: #f5f7fb; font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif; }
+      * { box-sizing: border-box; }
+      body { margin: 0; min-width: 320px; min-height: 100vh; }
+      button, input, select { font: inherit; }
+      button { cursor: pointer; }
+      .topbar { align-items: center; background: rgba(255,255,255,.95); border-bottom: 1px solid #e2e8f0; display: flex; gap: 24px; justify-content: space-between; padding: 18px max(24px, calc((100vw - 1180px) / 2)); position: sticky; top: 0; z-index: 10; }
+      .topbar h1 { font-size: 22px; margin: 3px 0 0; }
+      .eyebrow { color: #64748b; font-size: 12px; font-weight: 800; letter-spacing: .18em; margin: 0; text-transform: uppercase; }
+      nav { display: flex; flex-wrap: wrap; gap: 8px; }
+      .nav, .secondary { background: #f1f5f9; border: 0; border-radius: 999px; color: #475569; font-weight: 700; padding: 9px 15px; }
+      .nav.active, .primary, .pill.dark { background: #0f172a; color: #fff; }
+      main { margin: 0 auto; max-width: 1180px; padding: 24px; }
+      .hero { background: #0f172a; border-radius: 28px; color: #fff; padding: 34px; }
+      .hero h2 { font-size: clamp(28px, 5vw, 42px); margin: 12px 0; }
+      .hero p:last-child { color: #cbd5e1; line-height: 1.8; max-width: 780px; }
+      .card, .risk { background: #fff; border: 1px solid #e2e8f0; border-radius: 22px; box-shadow: 0 1px 2px rgba(15,23,42,.04); padding: 22px; }
+      .card h2, .risk h3 { margin: 0 0 14px; }
+      .entry-grid, .formula-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); margin-top: 18px; }
+      .entry { text-align: left; transition: transform .2s, border-color .2s; }
+      .entry:hover { border-color: #94a3b8; transform: translateY(-2px); }
+      .entry strong { display: block; font-size: 18px; margin-bottom: 8px; }
+      .entry span, .muted, .card p { color: #64748b; line-height: 1.7; }
+      .workspace { align-items: start; display: grid; gap: 22px; grid-template-columns: minmax(0, 1fr) 480px; }
+      .workspace aside { position: sticky; top: 98px; }
+      .form-stack, .zone-list { display: grid; gap: 18px; }
+      .grid { display: grid; gap: 16px; margin-top: 14px; }
+      .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .grid.five { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+      label span { color: #334155; display: block; font-size: 14px; font-weight: 700; margin-bottom: 7px; }
+      input, select { background: #fff; border: 1px solid #dbe3ef; border-radius: 14px; color: #172033; outline: none; padding: 11px 12px; width: 100%; }
+      input:focus, select:focus { border-color: #475569; box-shadow: 0 0 0 3px #e2e8f0; }
+      .check { align-items: center; color: #475569; display: flex; gap: 8px; }
+      .check input { width: auto; }
+      .checks { align-content: end; display: grid; gap: 10px; }
+      .checks.wide { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .summary-head { align-items: start; display: flex; gap: 14px; justify-content: space-between; }
+      .pill { background: #f1f5f9; border-radius: 999px; color: #475569; display: inline-flex; font-size: 13px; font-weight: 800; padding: 7px 12px; white-space: nowrap; }
+      .mini-grid { display: grid; gap: 8px 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); margin-top: 14px; }
+      .primary { border: 0; border-radius: 14px; font-weight: 800; margin-top: 16px; padding: 11px 16px; }
+      .success { background: #ecfdf5; border-radius: 14px; color: #047857 !important; margin: 12px 0 0; padding: 10px 12px; }
+      .risk { background: #fffbeb; border-color: #fde68a; margin: 16px 0; }
+      .risk.safe { background: #ecfdf5; border-color: #a7f3d0; }
+      .risk ul, ol { line-height: 1.8; margin: 0; padding-left: 22px; }
+      .zone-card { border: 1px solid #e2e8f0; border-radius: 18px; padding: 16px; }
+      .note { background: #f8fafc; border-radius: 14px; padding: 12px; }
+      .table-wrap { overflow-x: auto; }
+      table { border-collapse: collapse; min-width: 860px; width: 100%; }
+      th { background: #f1f5f9; color: #334155; }
+      th, td { border-bottom: 1px solid #e2e8f0; padding: 12px; text-align: left; }
+      .history-layout { display: grid; gap: 22px; grid-template-columns: 360px minmax(0, 1fr); }
+      .history-list { display: grid; gap: 12px; }
+      .history-item { border: 1px solid #e2e8f0; border-radius: 16px; display: grid; gap: 6px; padding: 14px; text-align: left; width: 100%; }
+      .history-item.active { border-color: #0f172a; background: #f8fafc; }
+      .history-item span, .history-item small { color: #64748b; }
+      .empty { color: #64748b; text-align: center; }
+      @media (max-width: 980px) { .topbar, .workspace, .history-layout { display: block; } nav, .workspace aside { margin-top: 14px; position: static; } .grid.two, .grid.three, .grid.five, .mini-grid, .checks.wide { grid-template-columns: 1fr; } }
+    </style>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script id="formula-data" type="application/json">
+[
+  {"id":"color_001","name":"冷棕色","tone":"冷色","levelRange":{"min":6,"max":7},"targetLevel":7,"targetEffect":"低调冷感棕色，适合通勤与遮白微调整","baseRequirement":"底色建议在6-7度","formula":[{"product":"染膏A","shade":"7/1","ratio":1},{"product":"染膏B","shade":"6/0","ratio":0.3}],"developer":"6%","mixRatio":"1:1","processingTime":"35分钟","needBleach":false,"suitableForGrayCoverage":true,"notes":["底色偏暖时需要增加冷色控制","白发比例高时增加基色比例"],"risks":["发尾过浅时容易偏暗","暖色残留明显时可能偏浊"]},
+  {"id":"color_002","name":"雾感茶棕","tone":"雾感","levelRange":{"min":8,"max":9},"targetLevel":8,"targetEffect":"柔和雾面茶棕，降低橙黄底色的透出","baseRequirement":"底色建议在8-9度，发尾不宜过度受损","formula":[{"product":"染膏A","shade":"8/11","ratio":1},{"product":"染膏C","shade":"8/7","ratio":0.5}],"developer":"6%","mixRatio":"1:1","processingTime":"30-35分钟","needBleach":false,"suitableForGrayCoverage":false,"notes":["暖色残留重时先做色素清理","发尾过浅时降低灰感比例"],"risks":["白发比例高时遮盖不足","底色不均会导致雾感斑驳"]},
+  {"id":"color_003","name":"奶茶米棕","tone":"暖中性","levelRange":{"min":10,"max":12},"targetLevel":10,"targetEffect":"透明轻盈的奶茶米棕效果","baseRequirement":"底色建议在10-12度，橙红残留需先处理","formula":[{"product":"染膏D","shade":"10/7","ratio":1},{"product":"染膏E","shade":"10/1","ratio":0.2}],"developer":"3%或6%","mixRatio":"1:1.5","processingTime":"25-30分钟","needBleach":true,"suitableForGrayCoverage":false,"notes":["建议统一底色后再上色","严重受损发尾缩短停放时间"],"risks":["底色不足会偏橙","高明度发尾容易空色或吸色不均"]},
+  {"id":"color_004","name":"玫瑰粉棕","tone":"暖色","levelRange":{"min":13,"max":15},"targetLevel":13,"targetEffect":"粉棕调明显，保留柔和暖感","baseRequirement":"底色建议在13-15度且尽量干净","formula":[{"product":"染膏F","shade":"PINK","ratio":0.6},{"product":"染膏D","shade":"10/7","ratio":1}],"developer":"3%","mixRatio":"1:1.5","processingTime":"20-25分钟","needBleach":true,"suitableForGrayCoverage":false,"notes":["漂后需评估发尾弹性","允许明显褪色时更适合此类透明色"],"risks":["残留冷色会影响粉感","受损发尾容易吸深"]},
+  {"id":"color_005","name":"铂金灰","tone":"冷色","levelRange":{"min":16,"max":null},"targetLevel":16,"targetEffect":"高明度铂金灰冷感效果","baseRequirement":"底色需16度以上并接近均匀浅黄","formula":[{"product":"染膏G","shade":"SILVER","ratio":1},{"product":"染膏H","shade":"VIOLET","ratio":0.1}],"developer":"1.5%或3%","mixRatio":"1:2","processingTime":"10-20分钟，需目测","needBleach":true,"suitableForGrayCoverage":false,"notes":["必须先做发质承受度评估","建议分段漂浅并做护理"],"risks":["对发质要求高","底色不够浅会偏绿偏脏"]},
+  {"id":"color_006","name":"自然黑茶","tone":"自然色","levelRange":{"min":6,"max":7},"targetLevel":6,"targetEffect":"自然深茶感，可兼顾低比例白发","baseRequirement":"底色6-7度或浅色回填后使用","formula":[{"product":"染膏B","shade":"6/0","ratio":1},{"product":"染膏C","shade":"6/7","ratio":0.5}],"developer":"6%","mixRatio":"1:1","processingTime":"35分钟","needBleach":false,"suitableForGrayCoverage":true,"notes":["白发比例超过50%时提高基色比例","浅发尾建议先回填暖色素"],"risks":["发尾过浅可能沉暗","一碗涂抹容易根部偏亮"]}
+]
+    </script>
+    <script>
+      const HISTORY_KEY = 'hair-color-formula-cases';
+      const app = document.querySelector('#app');
+      const formulas = JSON.parse(document.querySelector('#formula-data').textContent);
+      const damageOptions = ['健康', '轻度受损', '中度受损', '严重受损'];
+      const grayOptions = ['0%', '1-30%', '31-50%', '51-80%', '80%以上'];
+      const toneOptions = ['自然色', '冷色', '暖色', '雾感', '暖中性'];
+      let page = location.hash.replace('#', '').split('?')[0] || 'dashboard';
+      let selectedHistoryId = '';
+      let savedMessage = '';
+      let customerName = '';
+      let stylist = '';
+      let caseDate = new Date().toISOString().slice(0, 10);
+      let hairStatus = {
+        newGrowth: { length: '3cm', level: 4, pigmentStatus: '自然黑', hasGrayHair: false, grayPercentage: '0%', texture: '普通', damage: '健康' },
+        midLength: { level: 7, baseTone: '偏橙', artificialPigmentResidue: true, warmResidue: true, damage: '轻度受损' },
+        ends: { level: 10, baseTone: '偏黄', artificialPigmentResidue: true, warmResidue: false, damage: '中度受损' },
+      };
+      let target = { colorName: '冷棕色', targetLevel: 7, tone: '冷色', needBleach: false, needEvenBase: true, needGrayCoverage: false, allowFade: false, acceptMultipleSteps: true };
+      const escapeHtml = (value) => String(value ?? '').replace(/[&<>'"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[char] ?? char));
+      const toNumber = (value) => Number(value) || 0;
+      const yesNo = (value) => value ? '是' : '否';
+      const matchLevelRange = (targetLevel, min, max) => targetLevel >= min && (max === null || targetLevel <= max);
+      const formatLevelRange = (range) => range.max === null ? `${range.min}度以上` : `${range.min}-${range.max}度`;
+      const grayHairScore = (value) => ({ '0%': 0, '1-30%': 1, '31-50%': 2, '51-80%': 3, '80%以上': 4 }[value] ?? 0);
+      const damageScore = (damage) => ({ '健康': 0, '轻度受损': 1, '中度受损': 2, '严重受损': 3 }[damage] ?? 0);
+      const getHistory = () => JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+      const setHistory = (cases) => localStorage.setItem(HISTORY_KEY, JSON.stringify(cases));
+
+      function findBestFormula(target) {
+        return formulas.find((formula) => formula.name === target.colorName && matchLevelRange(target.targetLevel, formula.levelRange.min, formula.levelRange.max) && formula.needBleach === target.needBleach)
+          || formulas.find((formula) => (formula.name.includes(target.colorName) || target.colorName.includes(formula.name)) && matchLevelRange(target.targetLevel, formula.levelRange.min, formula.levelRange.max))
+          || formulas.find((formula) => matchLevelRange(target.targetLevel, formula.levelRange.min, formula.levelRange.max));
+      }
+
+      function shouldSectionHair(hairStatus) {
+        const levels = [hairStatus.newGrowth.level, hairStatus.midLength.level, hairStatus.ends.level];
+        return Math.max(...levels) - Math.min(...levels) >= 2 || damageScore(hairStatus.ends.damage) >= 3 || hairStatus.midLength.artificialPigmentResidue || hairStatus.ends.artificialPigmentResidue || grayHairScore(hairStatus.newGrowth.grayPercentage) >= 2;
+      }
+
+      function generateGrayHairAdvice(value, targetLevel, tone) {
+        if (value === '0%') return [];
+        const advice = ['有白发时需保留基色参与配方，避免只用目标色导致遮盖不足。'];
+        if (grayHairScore(value) >= 2) advice.push('白发比例较高，建议提高基色比例，并根据目标色调整双氧与停放时间。');
+        if (targetLevel >= 9) advice.push('目标色偏浅时遮白能力下降，需要提前与顾客确认遮盖预期。');
+        if (['冷色', '雾感'].includes(tone)) advice.push('冷色、雾感或透明感目标色不一定适合高比例白发，需优先保证遮白稳定性。');
+        return advice;
+      }
+
+      function generateRisks(hairStatus, target, needSectioning) {
+        const risks = [];
+        if (hairStatus.ends.damage === '严重受损') {
+          risks.push('发尾严重受损，不建议高浓度双氧或长时间停放。');
+          risks.push('发尾容易吸色偏暗，建议降低色素浓度、缩短时间并加入护理或酸性处理。');
+        }
+        if (hairStatus.midLength.warmResidue && target.tone === '冷色') risks.push('发中有暖色残留，目标冷色可能偏浊。');
+        if (hairStatus.ends.warmResidue && target.tone === '冷色') risks.push('发尾有暖色残留，冷色目标可能不干净，建议先清理残留。');
+        if (hairStatus.ends.level > target.targetLevel) risks.push('发尾明度高于目标明度，容易吸色偏暗，需要控制色素浓度或先回填。');
+        if (hairStatus.midLength.level < target.targetLevel || hairStatus.ends.level < target.targetLevel) risks.push('发中或发尾低于目标明度，可能需要先褪色或沐浴漂，不能直接假设一步到位。');
+        if (target.targetLevel - hairStatus.newGrowth.level >= 3) risks.push('目标明度比新生发高较多，可能需要更高提升力或预先提浅，但需结合发质谨慎判断双氧。');
+        if (hairStatus.midLength.artificialPigmentResidue || hairStatus.ends.artificialPigmentResidue) risks.push('发中或发尾存在人工色素残留，建议先做残留评估，避免目标色发浊或不均。');
+        if (needSectioning) risks.push('建议分区操作，不建议一碗配方全头涂抹。');
+        if (hairStatus.newGrowth.hasGrayHair || target.needGrayCoverage) risks.push(...generateGrayHairAdvice(hairStatus.newGrowth.grayPercentage, target.targetLevel, target.tone));
+        if (grayHairScore(hairStatus.newGrowth.grayPercentage) >= 2 && !target.needGrayCoverage) risks.push('当前白发比例较高，但目标未勾选遮白，请确认顾客是否接受白发透出。');
+        return [...new Set(risks)];
+      }
+
+      function buildZoneAdvice(zone, currentLevel, damage, hasResidue, target, formula) {
+        const levelDelta = target.targetLevel - currentLevel;
+        const severeEnds = zone === '发尾' && damage === '严重受损';
+        return {
+          zone,
+          formulaName: formula?.name ?? '示例占位配方',
+          formulaItems: formula?.formula ?? [{ product: '待补充染膏', shade: `${target.targetLevel}/${target.tone}`, ratio: 1 }],
+          developer: severeEnds ? '低浓度双氧（1.5%-3%）' : formula?.developer ?? (levelDelta >= 2 ? '6%-9%（需发质评估）' : '3%-6%'),
+          mixRatio: formula?.mixRatio ?? '1:1',
+          processingTime: severeEnds ? '10-20分钟，需密切观察' : formula?.processingTime ?? '25-35分钟',
+          needToning: Math.abs(levelDelta) >= 1 || hasResidue,
+          needFilling: currentLevel > target.targetLevel,
+          needBleachBath: hasResidue && currentLevel < target.targetLevel,
+          needPreLighten: levelDelta >= 2 || (target.needBleach && currentLevel < target.targetLevel),
+          advice: zone === '发尾' && damage !== '健康' ? '发尾按受损程度降低刺激，优先缩短停放时间并观察吸色情况。' : levelDelta > 0 ? '当前明度低于目标，先评估提升力与残留，再决定是否预先提浅。' : levelDelta < 0 ? '当前明度高于目标，建议回填色素并降低吸色偏暗风险。' : '当前明度接近目标，可按目标色方向微调色调。',
+        };
+      }
+
+      function buildRecommendation(hairStatus, target) {
+        const formula = findBestFormula(target);
+        const needSectioning = shouldSectionHair(hairStatus);
+        const sectionAdvices = [
+          buildZoneAdvice('新生发', hairStatus.newGrowth.level, hairStatus.newGrowth.damage, false, target, formula),
+          buildZoneAdvice('发中', hairStatus.midLength.level, hairStatus.midLength.damage, hairStatus.midLength.artificialPigmentResidue, target, formula),
+          buildZoneAdvice('发尾', hairStatus.ends.level, hairStatus.ends.damage, hairStatus.ends.artificialPigmentResidue, target, formula),
+        ];
+        const risks = generateRisks(hairStatus, target, needSectioning);
+        const needBleach = target.needBleach || sectionAdvices.some((advice) => advice.needPreLighten || advice.needBleachBath);
+        const difficulty = target.needBleach || risks.length >= 6 || damageScore(hairStatus.ends.damage) >= 3 ? '高' : needSectioning || risks.length >= 3 || target.needEvenBase ? '中' : '低';
+        const directColoringSuitable = !needBleach && !needSectioning && risks.length <= 2;
+        const highRisk = difficulty === '高' || risks.length >= 6;
+        const steps = [];
+        if (hairStatus.ends.artificialPigmentResidue || hairStatus.ends.warmResidue) steps.push('先处理发尾残留色素，必要时做温和沐浴漂或色素清理。');
+        if (hairStatus.midLength.artificialPigmentResidue || hairStatus.midLength.level !== target.targetLevel) steps.push('再评估并统一发中底色，避免发中与发尾目标色不一致。');
+        if (needSectioning) steps.push('按新生发、发中、发尾分区调配与涂抹，不使用一碗配方全头处理。');
+        steps.push(hairStatus.newGrowth.hasGrayHair || target.needGrayCoverage ? '新生发区域优先执行遮白逻辑，保留足够基色比例。' : '新生发最后上色，避免根部温度导致过亮。');
+        if (damageScore(hairStatus.ends.damage) >= 2) steps.push('发尾根据受损程度缩短停放时间，过程中加强目测。');
+        steps.push('冲水后做锁色护理，并记录本次配方与顾客反馈。');
+        return { difficulty, needSectioning, needBleach, directColoringSuitable, highRisk, summary: `${directColoringSuitable ? '可考虑直接上色' : '不建议直接全头上色'}；${needBleach ? '可能需要漂发/提浅' : '暂不强制漂发'}；${needSectioning ? '需要分区操作' : '分区要求较低'}；翻车风险${highRisk ? '较高' : difficulty === '中' ? '中等' : '较低'}。`, sectionAdvices, steps, risks };
+      }
+
+      function shell(content) {
+        app.innerHTML = `<header class="topbar"><div><p class="eyebrow">Hair Color Studio</p><h1>染发配方工具</h1></div><nav>${[['dashboard','工作台'],['new','新建方案'],['search','高频色查询'],['history','历史方案'],['settings','设置']].map(([key,label]) => `<button class="nav ${page === key ? 'active' : ''}" data-page="${key}">${label}</button>`).join('')}</nav></header><main>${content}</main>`;
+        app.querySelectorAll('[data-page]').forEach((button) => button.addEventListener('click', () => { page = button.dataset.page; location.hash = page; savedMessage = ''; render(); }));
+      }
+
+      function field(label, name, value, type = 'text', extra = '') { return `<label><span>${label}</span><input name="${name}" type="${type}" value="${escapeHtml(value)}" ${extra}></label>`; }
+      function selectField(label, name, value, options) { return `<label><span>${label}</span><select name="${name}">${options.map((option) => `<option ${option === value ? 'selected' : ''}>${option}</option>`).join('')}</select></label>`; }
+      function checkbox(label, name, checked) { return `<label class="check"><input name="${name}" type="checkbox" ${checked ? 'checked' : ''}> ${label}</label>`; }
+
+      function renderDashboard() {
+        shell(`<section class="hero"><p class="eyebrow">内部工作台</p><h2>染发配方推荐工具 MVP</h2><p>根据新生发、发中、发尾的实际显示明度与发况，辅助发型师输出分区配方、操作流程、风险提示和本地历史记录。</p></section><section class="entry-grid">${[['new','新建顾客染发方案','录入三段发况并实时生成分区配方建议。'],['search','高频色配方查询','按颜色、明度、色调、漂发与遮白快速筛选。'],['history','历史方案记录','查看本地保存的顾客配方与风险提示。'],['settings','配方数据管理 / 设置','查看当前 MVP 数据范围与扩展说明。']].map(([key,title,desc]) => `<button class="card entry" data-page="${key}"><strong>${title}</strong><span>${desc}</span></button>`).join('')}</section>`);
+      }
+
+      function renderResult(withSave = true) {
+        const recommendation = buildRecommendation(hairStatus, target);
+        return `<section class="card"><div class="summary-head"><div><h2>推荐摘要</h2><p>${recommendation.summary}</p></div><strong class="pill dark">难度：${recommendation.difficulty}</strong></div><div class="mini-grid"><p><b>适合直接上色：</b>${yesNo(recommendation.directColoringSuitable)}</p><p><b>需要漂发/提浅：</b>${yesNo(recommendation.needBleach)}</p><p><b>需要分区：</b>${yesNo(recommendation.needSectioning)}</p><p><b>较大翻车风险：</b>${yesNo(recommendation.highRisk)}</p></div>${withSave ? '<button class="primary" id="save-case">保存到历史方案</button>' : ''}${savedMessage ? `<p class="success">${savedMessage}</p>` : ''}</section><section class="risk ${recommendation.risks.length ? '' : 'safe'}"><h3>${recommendation.risks.length ? '风险提示' : '暂无明显风险'}</h3>${recommendation.risks.length ? `<ul>${recommendation.risks.map((risk) => `<li>⚠️ ${risk}</li>`).join('')}</ul>` : '<p>仍建议现场做发质与色素评估。</p>'}</section><section class="card"><h2>分区配方建议</h2><div class="zone-list">${recommendation.sectionAdvices.map((advice) => `<article class="zone-card"><div class="summary-head"><h3>${advice.zone} · ${escapeHtml(advice.formulaName)}</h3><span>停放：${escapeHtml(advice.processingTime)}</span></div><div class="mini-grid"><p><b>染膏：</b>${advice.formulaItems.map((item) => `${escapeHtml(item.product)} ${escapeHtml(item.shade)}×${item.ratio}`).join(' + ')}</p><p><b>双氧：</b>${escapeHtml(advice.developer)}</p><p><b>调配比例：</b>${escapeHtml(advice.mixRatio)}</p><p><b>补色：</b>${yesNo(advice.needToning)}</p><p><b>打底/回填：</b>${yesNo(advice.needFilling)}</p><p><b>沐浴漂：</b>${yesNo(advice.needBleachBath)}</p><p><b>先褪色：</b>${yesNo(advice.needPreLighten)}</p></div><p class="note">${advice.advice}</p></article>`).join('')}</div></section><section class="card"><h2>操作流程</h2><ol>${recommendation.steps.map((step) => `<li>${step}</li>`).join('')}</ol></section>`;
+      }
+
+      function syncCaseForm(form) {
+        const data = new FormData(form);
+        customerName = String(data.get('customerName') ?? '');
+        stylist = String(data.get('stylist') ?? '');
+        caseDate = String(data.get('caseDate') ?? caseDate);
+        hairStatus = { newGrowth: { length: String(data.get('newGrowthLength') ?? ''), level: toNumber(data.get('newGrowthLevel')), pigmentStatus: String(data.get('pigmentStatus') ?? ''), hasGrayHair: data.has('hasGrayHair'), grayPercentage: String(data.get('grayPercentage')), texture: String(data.get('texture') ?? '普通'), damage: String(data.get('newGrowthDamage')) }, midLength: { level: toNumber(data.get('midLevel')), baseTone: String(data.get('midBaseTone') ?? ''), artificialPigmentResidue: data.has('midResidue'), warmResidue: data.has('midWarmResidue'), damage: String(data.get('midDamage')) }, ends: { level: toNumber(data.get('endsLevel')), baseTone: String(data.get('endsBaseTone') ?? ''), artificialPigmentResidue: data.has('endsResidue'), warmResidue: data.has('endsWarmResidue'), damage: String(data.get('endsDamage')) } };
+        target = { colorName: String(data.get('colorName') ?? ''), targetLevel: toNumber(data.get('targetLevel')), tone: String(data.get('tone') ?? '冷色'), needBleach: data.has('needBleach'), needEvenBase: data.has('needEvenBase'), needGrayCoverage: data.has('needGrayCoverage'), allowFade: data.has('allowFade'), acceptMultipleSteps: data.has('acceptMultipleSteps') };
+      }
+
+      function renderNewCase() {
+        shell(`<div class="workspace"><form id="case-form" class="form-stack"><section class="card"><h2>顾客基础信息</h2><div class="grid three">${field('顾客姓名（可选）','customerName',customerName,'text','placeholder="顾客A"')}${field('日期','caseDate',caseDate,'date')}${field('发型师（可选）','stylist',stylist,'text','placeholder="发型师A"')}</div></section><section class="card"><h2>新生发</h2><div class="grid two">${field('新生发长度','newGrowthLength',hairStatus.newGrowth.length,'text','placeholder="如 3cm"')}${field('新生发明度','newGrowthLevel',hairStatus.newGrowth.level,'number','min="1"')}${field('色素情况','pigmentStatus',hairStatus.newGrowth.pigmentStatus,'text','placeholder="自然黑 / 偏暖"')}${selectField('发质粗细','texture',hairStatus.newGrowth.texture,['细软','普通','粗硬'])}${selectField('白发比例','grayPercentage',hairStatus.newGrowth.grayPercentage,grayOptions)}${selectField('受损程度','newGrowthDamage',hairStatus.newGrowth.damage,damageOptions)}${checkbox('是否有白发','hasGrayHair',hairStatus.newGrowth.hasGrayHair)}</div></section><section class="card"><h2>发中</h2><div class="grid two">${field('发中明度','midLevel',hairStatus.midLength.level,'number','min="1"')}${field('发中底色','midBaseTone',hairStatus.midLength.baseTone,'text','placeholder="偏橙 / 偏黄"')}${selectField('受损程度','midDamage',hairStatus.midLength.damage,damageOptions)}<div class="checks">${checkbox('有人工色素残留','midResidue',hairStatus.midLength.artificialPigmentResidue)}${checkbox('有暖色残留','midWarmResidue',hairStatus.midLength.warmResidue)}</div></div></section><section class="card"><h2>发尾</h2><div class="grid two">${field('发尾明度','endsLevel',hairStatus.ends.level,'number','min="1"')}${field('发尾底色','endsBaseTone',hairStatus.ends.baseTone,'text','placeholder="偏橙 / 偏黄"')}${selectField('受损程度','endsDamage',hairStatus.ends.damage,damageOptions)}<div class="checks">${checkbox('有人工色素残留','endsResidue',hairStatus.ends.artificialPigmentResidue)}${checkbox('有暖色残留','endsWarmResidue',hairStatus.ends.warmResidue)}</div></div></section><section class="card"><h2>目标色</h2><div class="grid two">${field('目标色名称','colorName',target.colorName,'text','list="formula-names"')}<datalist id="formula-names">${formulas.map((formula) => `<option value="${escapeHtml(formula.name)}"></option>`).join('')}</datalist>${field('目标明度','targetLevel',target.targetLevel,'number','min="1"')}${selectField('目标色调','tone',target.tone,toneOptions)}<div class="checks wide">${checkbox('需要漂发','needBleach',target.needBleach)}${checkbox('需要统一底色','needEvenBase',target.needEvenBase)}${checkbox('需要遮白','needGrayCoverage',target.needGrayCoverage)}${checkbox('允许明显褪色','allowFade',target.allowFade)}${checkbox('接受多步骤操作','acceptMultipleSteps',target.acceptMultipleSteps)}</div></div></section></form><aside>${renderResult(true)}</aside></div>`);
+        const form = app.querySelector('#case-form');
+        form.addEventListener('input', () => { syncCaseForm(form); savedMessage = ''; renderNewCase(); });
+        app.querySelector('#save-case').addEventListener('click', () => { syncCaseForm(form); const nextCase = { id: `case_${Date.now()}`, customerName, date: caseDate, stylist, hairStatus, target, recommendation: buildRecommendation(hairStatus, target), createdAt: new Date().toISOString() }; setHistory([nextCase, ...getHistory()]); savedMessage = '已保存到历史方案。'; renderNewCase(); });
+      }
+
+      function renderFormulaCard(formula) {
+        return `<article class="card"><div class="summary-head"><div><h3>${formula.name}</h3><p>${formula.targetEffect}</p></div><span class="pill">${formatLevelRange(formula.levelRange)}</span></div><div class="mini-grid"><p><b>色调：</b>${formula.tone}</p><p><b>目标明度：</b>${formula.targetLevel}度</p><p><b>推荐底色：</b>${formula.baseRequirement}</p><p><b>双氧：</b>${formula.developer}</p><p><b>调配比例：</b>${formula.mixRatio}</p><p><b>停放时间：</b>${formula.processingTime}</p></div><p class="note"><b>推荐配方：</b>${formula.formula.map((item) => `${item.product} ${item.shade}×${item.ratio}`).join(' + ')}</p></article>`;
+      }
+
+      function renderSearch() {
+        const params = new URLSearchParams(location.hash.split('?')[1] ?? '');
+        const keyword = params.get('q') ?? '';
+        const range = params.get('range') ?? 'all';
+        const tone = params.get('tone') ?? 'all';
+        const bleach = params.get('bleach') ?? 'all';
+        const gray = params.get('gray') ?? 'all';
+        const toneList = [...new Set(formulas.map((formula) => formula.tone))];
+        const filtered = formulas.filter((formula) => {
+          const keywordMatched = formula.name.includes(keyword) || formula.targetEffect.includes(keyword) || formula.baseRequirement.includes(keyword);
+          const rangeMatched = range === 'all' || (range === '16+' ? formula.levelRange.max === null : range === formatLevelRange(formula.levelRange).replace('度', ''));
+          const toneMatched = tone === 'all' || formula.tone === tone;
+          const bleachMatched = bleach === 'all' || formula.needBleach === (bleach === 'yes');
+          const grayMatched = gray === 'all' || formula.suitableForGrayCoverage === (gray === 'yes');
+          return keywordMatched && rangeMatched && toneMatched && bleachMatched && grayMatched;
+        });
+        shell(`<section class="card"><h2>高频色配方查询</h2><p class="muted">示例数据已使用不重叠明度区间：6-7、8-9、10-12、13-15、16度以上。</p><form id="search-form" class="grid five">${field('颜色名称搜索','q',keyword,'search','placeholder="冷棕色"')}${selectField('明度区间','range',range,['all','6-7','8-9','10-12','13-15','16+'])}${selectField('色调','tone',tone,['all',...toneList])}${selectField('是否需要漂发','bleach',bleach,['all','yes','no'])}${selectField('适合遮白','gray',gray,['all','yes','no'])}</form></section><section class="card table-wrap"><table><thead><tr><th>颜色</th><th>明度区间</th><th>色调</th><th>推荐底色</th><th>漂发</th><th>遮白</th><th>双氧</th></tr></thead><tbody>${filtered.map((formula) => `<tr><td><b>${formula.name}</b></td><td>${formatLevelRange(formula.levelRange)}</td><td>${formula.tone}</td><td>${formula.baseRequirement}</td><td>${formula.needBleach ? '需要' : '不需要'}</td><td>${formula.suitableForGrayCoverage ? '适合' : '不适合'}</td><td>${formula.developer}</td></tr>`).join('')}</tbody></table></section><section class="formula-grid">${filtered.map(renderFormulaCard).join('')}</section>`);
+        app.querySelector('#search-form').addEventListener('input', (event) => { const next = new URLSearchParams(); new FormData(event.currentTarget).forEach((value, key) => next.set(key, String(value))); location.hash = `search?${next.toString()}`; renderSearch(); });
+      }
+
+      function renderHistory() {
+        const cases = getHistory();
+        selectedHistoryId = selectedHistoryId || cases[0]?.id || '';
+        const selected = cases.find((item) => item.id === selectedHistoryId) || cases[0];
+        shell(`<div class="history-layout"><section class="card"><div class="summary-head"><h2>历史方案</h2><button class="secondary" id="clear-history">清空</button></div><div class="history-list">${cases.length ? cases.map((item) => `<button class="history-item ${selected?.id === item.id ? 'active' : ''}" data-case="${item.id}"><b>${escapeHtml(item.customerName || '未命名顾客')} · ${escapeHtml(item.target.colorName)}</b><span>${item.date} / ${escapeHtml(item.stylist || '未填写发型师')}</span><small>难度：${item.recommendation.difficulty}　分区：${yesNo(item.recommendation.needSectioning)}</small></button>`).join('') : '<p class="muted">暂无本地历史方案，请先在新建方案中保存。</p>'}</div></section><section>${selected ? renderSavedCase(selected) : '<div class="card empty">暂无可查看方案。</div>'}</section></div>`);
+        app.querySelector('#clear-history').addEventListener('click', () => { localStorage.removeItem(HISTORY_KEY); selectedHistoryId = ''; renderHistory(); });
+        app.querySelectorAll('[data-case]').forEach((button) => button.addEventListener('click', () => { selectedHistoryId = button.dataset.case; renderHistory(); }));
+      }
+
+      function renderSavedCase(item) {
+        const saved = buildRecommendation(item.hairStatus, item.target);
+        return `<div class="card"><h2>${escapeHtml(item.customerName || '未命名顾客')}</h2><p class="muted">日期：${item.date}　发型师：${escapeHtml(item.stylist || '未填写')}　目标：${escapeHtml(item.target.colorName)} ${item.target.targetLevel}度</p></div><section class="risk ${saved.risks.length ? '' : 'safe'}"><h3>风险提示</h3><ul>${saved.risks.map((risk) => `<li>⚠️ ${risk}</li>`).join('')}</ul></section><section class="card"><h2>操作流程</h2><ol>${saved.steps.map((step) => `<li>${step}</li>`).join('')}</ol></section>`;
+      }
+
+      function renderSettings() {
+        shell(`<section class="card"><h2>配方数据管理 / 设置</h2><p class="muted">当前最终形态是一个独立 HTML 页面：直接双击或在浏览器打开 index.html 即可使用。配方数据已内置到页面中，后续可替换为完整表格、数据库或 API。</p></section><section class="formula-grid">${formulas.map(renderFormulaCard).join('')}</section>`);
+      }
+
+      function render() {
+        page = ['dashboard', 'new', 'search', 'history', 'settings'].includes(page) ? page : 'dashboard';
+        if (page === 'new') renderNewCase();
+        else if (page === 'search') renderSearch();
+        else if (page === 'history') renderHistory();
+        else if (page === 'settings') renderSettings();
+        else renderDashboard();
+      }
+
+      window.addEventListener('hashchange', () => { page = location.hash.replace('#', '').split('?')[0] || 'dashboard'; render(); });
+      render();
+    </script>
+  </body>
+</html>
